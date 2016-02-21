@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html ng-app>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<body>
+
+<div ng-controller="PostsController">
+    <strong class="error">{{ error }}</strong>
+    <strong ng-show="loading">loading..</strong>
+    <div ng-repeat="post in posts">
+        <strong ng-hide="editMode">{{ post.title }}</strong>
+        <input ng-show="editMode" type="text" ng-model="post.title"/>
+        <p>Author: {{ post.id }}</p>
+        <hr/>
+    </div>
+    <div ng-show="posts.length > 0">
+        <a ng-click="toggleEdit()" href="javascript:;">Edit</a>
+        <a ng-click="save()" href="javascript:;">Save</a>
+    </div>
+</div>
+
+<script>
+function PostsController($scope, $http) {
+ 
+    $scope.loading = true;
+    $scope.editMode = false;
+ 
+    $http.get('http://127.0.0.1:5000/book').success(function (data) {
+        $scope.posts = data;
+        $scope.loading = false;
+    })
+    .error(function () {
+        $scope.error = "An Error has occured while loading posts!";
+        $scope.loading = false;
+    });
+ 
+    $scope.toggleEdit = function() {
+        $scope.editMode = !$scope.editMode;
+    };
+ 
+    $scope.save = function() {
+        $http.put('http://127.0.0.1:5000/book', $scope.posts).success(function (data) {
+            alert("Saved Successfully!!");
+        }).error(function (data) {
+            $scope.error = "An Error has occured while Saving posts! " + data;
+            $scope.loading = false;
+        });
+    };
+ 
+}
+</script>
+
+</body>
+</html>
